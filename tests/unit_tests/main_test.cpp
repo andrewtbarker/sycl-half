@@ -81,7 +81,11 @@ void print_error_code(cl::sycl::exception const& e) {
 #ifdef __HIPSYCL__
     std::cout << "Backend status: " << e.code() << std::endl;
 #else
+#if defined(__SYCL_COMPILER_VERSION) && (__SYCL_COMPILER_VERSION >= 20210930)
+    std::cout << "Backend status: " << e.code().value() << std::endl;
+#else
     std::cout << "OpenCL status: " << e.get_cl_code() << std::endl;
+#endif
 #endif
 }
 

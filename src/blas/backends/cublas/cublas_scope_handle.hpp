@@ -64,13 +64,13 @@ class CublasScopedContextHandler {
     CUcontext original_;
     cl::sycl::context placedContext_;
     bool needToRecover_;
-    cl::sycl::interop_handler &ih;
+    cl::sycl::interop_handle &ih;
     static thread_local cublas_handle<pi_context> handle_helper;
     CUstream get_stream(const cl::sycl::queue &queue);
     cl::sycl::context get_context(const cl::sycl::queue &queue);
 
 public:
-    CublasScopedContextHandler(cl::sycl::queue queue, cl::sycl::interop_handler &ih);
+    CublasScopedContextHandler(cl::sycl::queue queue, cl::sycl::interop_handle &ih);
 
     ~CublasScopedContextHandler() noexcept(false);
     /**
@@ -85,7 +85,7 @@ public:
     // will be fixed when SYCL-2020 has been implemented for Pi backend.
     template <typename T, typename U>
     inline T get_mem(U acc) {
-        CUdeviceptr cudaPtr = ih.get_mem<cl::sycl::backend::cuda>(acc);
+        CUdeviceptr cudaPtr = ih.get_mem<cl::sycl::backend::ext_oneapi_cuda>(acc);
         return reinterpret_cast<T>(cudaPtr);
     }
 };

@@ -34,7 +34,7 @@ namespace cublas {
 thread_local cublas_handle<pi_context> CublasScopedContextHandler::handle_helper = cublas_handle<pi_context>{};
 
 CublasScopedContextHandler::CublasScopedContextHandler(cl::sycl::queue queue,
-                                                       cl::sycl::interop_handler &ih)
+                                                       cl::sycl::interop_handle &ih)
         : ih(ih),
           needToRecover_(false) {
     placedContext_ = queue.get_context();

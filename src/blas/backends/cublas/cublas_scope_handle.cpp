@@ -39,7 +39,11 @@ CublasScopedContextHandler::CublasScopedContextHandler(cl::sycl::queue queue,
           needToRecover_(false) {
     placedContext_ = queue.get_context();
     auto device = queue.get_device();
+#if defined(__SYCL_COMPILER_VERSION) && (__SYCL_COMPILER_VERSION >= 20210930)
+    auto desired = cl::sycl::get_native<cl::sycl::backend::ext_oneapi_cuda>(placedContext_);
+#else
     auto desired = cl::sycl::get_native<cl::sycl::backend::cuda>(placedContext_);
+#endif
     CUresult err;
     CUDA_ERROR_FUNC(cuCtxGetCurrent, err, &original_);
     if (original_ != desired) {
@@ -82,8 +86,13 @@ void ContextCallback(void *userData) {
 }
 
 cublasHandle_t CublasScopedContextHandler::get_handle(const cl::sycl::queue &queue) {
+#if defined(__SYCL_COMPILER_VERSION) && (__SYCL_COMPILER_VERSION >= 20210930)
+    auto piPlacedContext_ =
+        reinterpret_cast<pi_context>(cl::sycl::get_native<cl::sycl::backend::ext_oneapi_cuda>(placedContext_));
+#else
     auto piPlacedContext_ =
         reinterpret_cast<pi_context>(cl::sycl::get_native<cl::sycl::backend::cuda>(placedContext_));
+#endif
     CUstream streamId = get_stream(queue);
     cublasStatus_t err;
     auto it = handle_helper.cublas_handle_mapper_.find(piPlacedContext_);
@@ -122,7 +131,11 @@ cublasHandle_t CublasScopedContextHandler::get_handle(const cl::sycl::queue &que
 }
 
 CUstream CublasScopedContextHandler::get_stream(const cl::sycl::queue &queue) {
-    return cl::sycl::get_native<cl::sycl::backend::cuda>(queue);
+#if defined(__SYCL_COMPILER_VERSION) && (__SYCL_COMPILER_VERSION >= 20210930)
+    return cl::sycl::get_native<cl::sycl::backend::ext_oneapi_cuda>(queue);
+#else
+    return cl::sycl::get_native<cl::sycl::backend::cuda>(queue);    
+#endif
 }
 cl::sycl::context CublasScopedContextHandler::get_context(const cl::sycl::queue &queue) {
     return queue.get_context();

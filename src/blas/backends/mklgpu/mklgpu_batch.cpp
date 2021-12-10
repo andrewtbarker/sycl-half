@@ -31,15 +31,19 @@ namespace mklgpu {
 namespace column_major {
 
 #define MAJOR MKL_COL_MAJOR
+#define KERNEL_NAME ColMajorKernel    
 #include "mklgpu_batch.cxx"
 #undef MAJOR
+#undef KERNEL_NAME
 
 } // namespace column_major
 namespace row_major {
 
 #define MAJOR MKL_ROW_MAJOR
+#define KERNEL_NAME RowMajorKernel    
 #include "mklgpu_batch.cxx"
 #undef MAJOR
+#undef KERNEL_NAME
 
 } // namespace row_major
 } // namespace mklgpu
